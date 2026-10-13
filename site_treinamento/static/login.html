@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- O título começa como "Verificando..." e só vira "Login - ..." depois de
+       confirmar que o usuário NÃO está logado. Assim um robô (PyAutoGUI) pode
+       olhar o título da janela para saber em qual tela está. -->
+  <title>Verificando... - Cadastro de Produtos</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js"></script>
+</head>
+<body>
+  <header class="topo">
+    <h1>Cadastro de Produtos</h1>
+  </header>
+
+  <main class="cartao">
+    <h2>Login</h2>
+
+    <div id="mensagem" class="mensagem"></div>
+
+    <form id="form-login" autocomplete="off">
+      <div class="campo">
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" name="usuario" autofocus>
+      </div>
+
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha">
+      </div>
+
+      <div class="botoes">
+        <button type="submit" id="btn-entrar" class="btn btn-primario">Entrar</button>
+      </div>
+    </form>
+
+    <p class="rodape-login">Documentação da API: <a href="/docs" target="_blank">/docs</a></p>
+  </main>
+
+  <script>
+    // Se já estiver logado, vai direto para o cadastro
+    estaLogado().then((ok) => {
+      if (ok) {
+        window.location.href = "/cadastro";
+      } else {
+        document.title = "Login - Cadastro de Produtos";
+        document.getElementById("usuario").focus();
+      }
+    });
+
+    const form = document.getElementById("form-login");
+    const msg = document.getElementById("mensagem");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      limparMensagem(msg);
+
+      const usuario = document.getElementById("usuario").value.trim();
+      const senha = document.getElementById("senha").value;
+
+      if (!usuario || !senha) {
+        mostrarMensagem(msg, "Informe usuário e senha.", "erro");
+        return;
+      }
+
+      const resp = await api("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ usuario, senha }),
+      });
+
+      if (resp.ok) {
+        const dados = await resp.json();
+        setToken(dados.access_token);
+        window.location.href = "/cadastro";
+      } else {
+        mostrarMensagem(msg, await mensagemErro(resp), "erro");
+        document.getElementById("senha").value = "";
+        document.getElementById("senha").focus();
+      }
+    });
+  </script>
+</body>
+</html>

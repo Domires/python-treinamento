@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produtos - Cadastro de Produtos</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js"></script>
+  <script>exigirLogin();</script>
+</head>
+<body>
+  <header class="topo">
+    <h1>Cadastro de Produtos</h1>
+    <nav>
+      <a href="/cadastro">Cadastro</a>
+      <a href="/produtos" class="ativo">Produtos cadastrados</a>
+      <button type="button" id="btn-sair" onclick="logout()">Sair</button>
+    </nav>
+  </header>
+
+  <main class="cartao largo">
+    <h2>Produtos cadastrados</h2>
+
+    <div id="mensagem" class="mensagem"></div>
+
+    <div class="filtros">
+      <input type="text" id="filtro_fabrica" placeholder="Fábrica">
+      <input type="text" id="filtro_codigo" placeholder="Código do Material">
+      <input type="text" id="filtro_lote" placeholder="Lote">
+      <button type="button" id="btn-filtrar" class="btn btn-primario btn-pequeno">Filtrar</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fábrica</th>
+          <th>Código</th>
+          <th>Nome do Material</th>
+          <th>Lote</th>
+          <th>Produção</th>
+          <th>Validade</th>
+          <th>Quantidade</th>
+          <th>Unidade</th>
+          <th>Observação</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabela"></tbody>
+    </table>
+  </main>
+
+  <script>
+    const msg = document.getElementById("mensagem");
+    const tbody = document.getElementById("tabela");
+
+    function esc(texto) {
+      const div = document.createElement("div");
+      div.textContent = texto;
+      return div.innerHTML;
+    }
+
+    async function carregar() {
+      const params = new URLSearchParams();
+      const codigo = document.getElementById("filtro_codigo").value.trim();
+      const lote = document.getElementById("filtro_lote").value.trim();
+      const fabrica = document.getElementById("filtro_fabrica").value.trim();
+      if (codigo) params.set("codigo_material", codigo);
+      if (lote) params.set("lote", lote);
+      if (fabrica) params.set("fabrica", fabrica);
+
+      const resp = await api("/api/produtos?" + params.toString());
+      if (!resp.ok) {
+        mostrarMensagem(msg, await mensagemErro(resp), "erro");
+        return;
+      }
+      const produtos = await resp.json();
+
+      if (!produtos.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="vazio">Nenhum produto encontrado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = produtos.map((p) => `
+        <tr>
+          <td>${p.id}</td>
+          <td>${esc(p.fabrica)}</td>
+          <td>${esc(p.codigo_material)}</td>
+          <td>${esc(p.nome_material)}</td>
+          <td>${esc(p.lote)}</td>
+          <td>${isoParaBr(p.data_producao)}</td>
+          <td>${isoParaBr(p.data_validade)}</td>
+          <td>${p.quantidade}</td>
+          <td>${p.unidade_medida}</td>
+          <td class="obs">${esc(p.observacao)}</td>
+          <td class="acoes">
+            <a class="btn btn-secundario btn-pequeno" href="/cadastro?id=${p.id}">Editar</a>
+            <button class="btn btn-perigo btn-pequeno" onclick="excluir(${p.id})">Excluir</button>
+          </td>
+        </tr>`).join("");
+    }
+
+    async function excluir(id) {
+      if (!confirm(`Excluir o produto #${id}?`)) return;
+      const resp = await api("/api/produtos/" + id, { method: "DELETE" });
+      if (resp.ok) {
+        mostrarMensagem(msg, `Produto #${id} excluído.`, "sucesso");
+        carregar();
+      } else {
+        mostrarMensagem(msg, await mensagemErro(resp), "erro");
+      }
+    }
+
+    document.getElementById("btn-filtrar").addEventListener("click", carregar);
+    document.querySelectorAll(".filtros input").forEach((i) =>
+      i.addEventListener("keydown", (e) => { if (e.key === "Enter") carregar(); })
+    );
+
+    carregar();
+  </script>
+</body>
+</html>

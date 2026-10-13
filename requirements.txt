@@ -1,0 +1,19 @@
+# Janela interativa do VS Code (células #%%)
+ipykernel
+
+# Módulo 2 - pyautogui
+pyautogui
+pyperclip
+
+# Módulo 3 - API
+requests
+
+# Módulo 4 - pandas
+pandas
+openpyxl
+matplotlib
+
+# Site de treinamento (site_treinamento/main.py)
+fastapi
+uvicorn[standard]
+pyjwt

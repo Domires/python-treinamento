@@ -1,0 +1,108 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #eef1f5;
+  color: #1f2933;
+}
+
+/* ---------- Barra superior ---------- */
+.topo {
+  background: #1e3a5f;
+  color: #fff;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.topo h1 { font-size: 18px; margin: 0; }
+.topo nav a,
+.topo nav button {
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.5);
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin-left: 8px;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.topo nav a.ativo { background: rgba(255,255,255,.2); }
+
+/* ---------- Cartão central ---------- */
+.cartao {
+  background: #fff;
+  max-width: 480px;
+  margin: 32px auto;
+  padding: 24px 28px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+.cartao.largo { max-width: 1100px; }
+.cartao h2 { margin-top: 0; font-size: 20px; }
+
+/* ---------- Formulário (campos um abaixo do outro) ---------- */
+.campo { margin-bottom: 14px; }
+.campo label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.campo input,
+.campo select,
+.campo textarea {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  font-size: 15px;
+  border: 1px solid #b8c2cc;
+  border-radius: 4px;
+}
+.campo textarea { resize: vertical; min-height: 90px; font-family: inherit; }
+.campo select { background: #fff; }
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus { outline: 2px solid #3b82f6; border-color: #3b82f6; }
+
+.botoes { display: flex; gap: 10px; margin-top: 18px; }
+
+.btn {
+  padding: 10px 18px;
+  font-size: 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-primario { background: #2563eb; color: #fff; }
+.btn-primario:hover { background: #1d4ed8; }
+.btn-secundario { background: #e4e7eb; color: #1f2933; }
+.btn-perigo { background: #dc2626; color: #fff; }
+.btn-pequeno { padding: 5px 10px; font-size: 13px; }
+
+/* ---------- Mensagens ---------- */
+.mensagem {
+  display: none;
+  padding: 10px 12px;
+  border-radius: 4px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+.mensagem.sucesso { display: block; background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.mensagem.erro    { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+/* ---------- Tabela ---------- */
+.filtros { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.filtros input { padding: 8px; border: 1px solid #b8c2cc; border-radius: 4px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid #e4e7eb; text-align: left; }
+th { background: #f5f7fa; }
+td.acoes { white-space: nowrap; }
+td.obs { max-width: 220px; white-space: pre-wrap; word-break: break-word; }
+.vazio { text-align: center; color: #7b8794; padding: 20px; }
+
+.rodape-login { font-size: 13px; color: #7b8794; margin-top: 16px; text-align: center; }
+.rodape-login a { color: #2563eb; }

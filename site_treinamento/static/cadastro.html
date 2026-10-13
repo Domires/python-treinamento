@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - Cadastro de Produtos</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js"></script>
+  <script>exigirLogin();</script>
+</head>
+<body>
+  <header class="topo">
+    <h1>Cadastro de Produtos</h1>
+    <nav>
+      <a href="/cadastro" class="ativo">Cadastro</a>
+      <a href="/produtos">Produtos cadastrados</a>
+      <button type="button" id="btn-sair" onclick="logout()">Sair</button>
+    </nav>
+  </header>
+
+  <main class="cartao">
+    <h2 id="titulo">Novo Produto</h2>
+
+    <div id="mensagem" class="mensagem"></div>
+
+    <form id="form-produto" autocomplete="off">
+      <div class="campo">
+        <label for="fabrica">Fábrica</label>
+        <input type="text" id="fabrica" name="fabrica" maxlength="100" autofocus>
+      </div>
+
+      <div class="campo">
+        <label for="codigo_material">Código do Material</label>
+        <input type="text" id="codigo_material" name="codigo_material" maxlength="50">
+      </div>
+
+      <div class="campo">
+        <label for="nome_material">Nome do Material</label>
+        <input type="text" id="nome_material" name="nome_material" maxlength="200">
+      </div>
+
+      <div class="campo">
+        <label for="lote">Lote</label>
+        <input type="text" id="lote" name="lote" maxlength="50">
+      </div>
+
+      <div class="campo">
+        <label for="data_producao">Data de Produção</label>
+        <input type="text" id="data_producao" name="data_producao" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric">
+      </div>
+
+      <div class="campo">
+        <label for="data_validade">Data de Validade</label>
+        <input type="text" id="data_validade" name="data_validade" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric">
+      </div>
+
+      <div class="campo">
+        <label for="quantidade">Quantidade</label>
+        <input type="number" id="quantidade" name="quantidade" min="0" step="1">
+      </div>
+
+      <div class="campo">
+        <label for="unidade_medida">Unidade de Medida</label>
+        <select id="unidade_medida" name="unidade_medida">
+          <option value="">Selecione...</option>
+          <option value="KG">KG</option>
+          <option value="T">T</option>
+          <option value="L">L</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="observacao">Observação</label>
+        <textarea id="observacao" name="observacao" rows="4" maxlength="1000"></textarea>
+      </div>
+
+
+      <div class="botoes">
+        <button type="submit" id="btn-salvar" class="btn btn-primario">Salvar</button>
+        <button type="button" id="btn-limpar" class="btn btn-secundario">Limpar</button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    const form = document.getElementById("form-produto");
+    const msg = document.getElementById("mensagem");
+    // Campos obrigatórios (Observação é opcional)
+    const CAMPOS = ["fabrica", "codigo_material", "nome_material", "lote", "data_producao",
+                    "data_validade", "quantidade", "unidade_medida"];
+
+    aplicarMascaraData(document.getElementById("data_producao"));
+    aplicarMascaraData(document.getElementById("data_validade"));
+
+    // Modo edição: /cadastro?id=123
+    const idEdicao = new URLSearchParams(window.location.search).get("id");
+
+    function valor(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function limparFormulario() {
+      form.reset();
+      document.getElementById("fabrica").focus();
+    }
+
+    async function carregarProduto(id) {
+      const resp = await api("/api/produtos/" + id);
+      if (!resp.ok) {
+        mostrarMensagem(msg, await mensagemErro(resp), "erro");
+        return;
+      }
+      const p = await resp.json();
+      document.getElementById("titulo").textContent = "Editar Produto #" + p.id;
+      document.getElementById("btn-salvar").textContent = "Salvar alterações";
+      document.getElementById("fabrica").value = p.fabrica;
+      document.getElementById("codigo_material").value = p.codigo_material;
+      document.getElementById("nome_material").value = p.nome_material;
+      document.getElementById("lote").value = p.lote;
+      document.getElementById("data_producao").value = isoParaBr(p.data_producao);
+      document.getElementById("data_validade").value = isoParaBr(p.data_validade);
+      document.getElementById("quantidade").value = p.quantidade;
+      document.getElementById("unidade_medida").value = p.unidade_medida;
+      document.getElementById("observacao").value = p.observacao;
+    }
+
+    if (idEdicao) carregarProduto(idEdicao);
+
+    document.getElementById("btn-limpar").addEventListener("click", () => {
+      limparMensagem(msg);
+      limparFormulario();
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      limparMensagem(msg);
+
+      // Validação simples no navegador
+      const vazios = CAMPOS.filter((c) => !valor(c));
+      if (vazios.length) {
+        const nomes = vazios.map((c) => document.querySelector(`label[for=${c}]`).textContent);
+        mostrarMensagem(msg, "Preencha os campos: " + nomes.join(", "), "erro");
+        document.getElementById(vazios[0]).focus();
+        return;
+      }
+
+      const dataProducao = brParaIso(valor("data_producao"));
+      const dataValidade = brParaIso(valor("data_validade"));
+      if (!dataProducao) {
+        mostrarMensagem(msg, "Data de Produção inválida (use dd/mm/aaaa).", "erro");
+        return;
+      }
+      if (!dataValidade) {
+        mostrarMensagem(msg, "Data de Validade inválida (use dd/mm/aaaa).", "erro");
+        return;
+      }
+
+      const quantidade = Number(valor("quantidade"));
+      if (!Number.isInteger(quantidade) || quantidade < 0) {
+        mostrarMensagem(msg, "Quantidade deve ser um número inteiro maior ou igual a zero.", "erro");
+        return;
+      }
+
+      const produto = {
+        fabrica: valor("fabrica"),
+        codigo_material: valor("codigo_material"),
+        nome_material: valor("nome_material"),
+        lote: valor("lote"),
+        data_producao: dataProducao,
+        data_validade: dataValidade,
+        quantidade: quantidade,
+        unidade_medida: valor("unidade_medida"),
+        observacao: valor("observacao"),
+      };
+
+      const resp = await api(idEdicao ? "/api/produtos/" + idEdicao : "/api/produtos", {
+        method: idEdicao ? "PUT" : "POST",
+        body: JSON.stringify(produto),
+      });
+
+      if (resp.ok) {
+        const salvo = await resp.json();
+        if (idEdicao) {
+          mostrarMensagem(msg, `Produto #${salvo.id} atualizado com sucesso!`, "sucesso");
+        } else {
+          // Sem mensagem de sucesso: apenas limpa o formulário (facilita o PyAutoGUI)
+          limparFormulario();
+        }
+      } else {
+        mostrarMensagem(msg, await mensagemErro(resp), "erro");
+      }
+    });
+  </script>
+</body>
+</html>

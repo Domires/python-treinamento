@@ -1,0 +1,11 @@
+﻿fabrica;codigo_material;nome_material;lote;data_producao;data_validade;quantidade;unidade_medida;observacao
+Fábrica São Paulo;MAT-0001;Açúcar Cristal;L2026-001;01/10/2026;01/10/2027;500;KG;Armazenar em local seco e arejado
+Fábrica Campinas;MAT-0002;Óleo de Soja Refinado;L2026-002;15/09/2026;15/03/2027;1200;L;
+Fábrica Curitiba;MAT-0003;Farinha de Trigo Tipo 1;L2026-003;20/09/2026;20/03/2027;8;T;Lote destinado à exportação
+Fábrica Belo Horizonte;MAT-0004;Leite Integral UHT;L2026-004;05/10/2026;05/02/2027;3000;L;Manter abaixo de 25 °C
+Fábrica São Paulo;MAT-0005;Sal Refinado Iodado;L2026-005;10/08/2026;10/08/2028;750;KG;
+Fábrica Porto Alegre;MAT-0006;Arroz Branco Tipo 1;L2026-006;12/09/2026;12/09/2027;15;T;Conferir umidade antes da expedição
+Fábrica Recife;MAT-0007;Suco de Laranja Integral;L2026-007;01/10/2026;01/01/2027;850;L;Produto refrigerado
+Fábrica Campinas;MAT-0008;Café Torrado e Moído;L2026-008;25/09/2026;25/09/2027;320;KG;Embalagem a vácuo
+Fábrica Curitiba;MAT-0009;Feijão Carioca;L2026-009;18/09/2026;18/09/2027;6;T;
+Fábrica Belo Horizonte;MAT-0010;Vinagre de Álcool;L2026-010;30/09/2026;30/09/2028;450;L;Frágil - empilhar no máximo 4 caixas
